@@ -21,13 +21,6 @@ import scala.concurrent.Future
  */
 object OutputService extends Controller {
 
-  def registerUser(email: String) = Action {
-    DB.withConnection { implicit connection =>
-      val user = User.findOrCreateByEmail(email)
-      Ok(Json.obj("error" -> JsBoolean(user.isEmpty)))
-    }
-  }
-
   def sendData = Action.async { request: Request[AnyContent] =>
     DB.withConnection { implicit connection =>
       val statId: Option[Long] = {
@@ -40,8 +33,8 @@ object OutputService extends Controller {
     }
   }
 
-  def test = Action {
-    Ok(views.html.websocket())
+  def test(email: String) = Action {
+    Ok(views.html.websocket(email))
   }
 
   protected def sendMessage(statId: Option[Long])(implicit connection: Connection): Boolean = {
@@ -49,16 +42,16 @@ object OutputService extends Controller {
       val stat = Stat.findById(statId.get)
       if (stat.isDefined) {
         val msg = Json.stringify(stat.get.toJson)
-        val channel = Cache.getAs[(Int, Enumerator[String], Channel[String])]("channel_" + stat.get.user.id.get)
+        val channel = Cache.getAs[(Int, Enumerator[String], Channel[String])]("channel_" + stat.get.user.email)
         if (channel.isDefined) channel.get._3.push(msg)
         true
       } else false
     }else false
   }
 
-  def websocket(userId: Long) = WebSocket.async[String]{ request =>
+  def websocket(userEmail: String) = WebSocket.async[String]{ request =>
     Future {
-      val cacheKey = "channel_" + userId
+      val cacheKey = "channel_" + userEmail
       val out = {
         val currentChannel = Cache.getAs[(Int, Enumerator[String], Channel[String])](cacheKey)
         if (currentChannel.isDefined) currentChannel.get._2
