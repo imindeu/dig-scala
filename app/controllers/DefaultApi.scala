@@ -35,7 +35,23 @@ object DefaultApi extends Controller {
     }
   }
 
-  def indexHypercounter = Action(parse.json) { request =>
+  def indexHypercounter(name: String) = Action { request =>
+    DB.withConnection { implicit connection =>
+      User.findOrCreateByEmail("hypercounter.herokuapp.com").map {
+        user => {
+          Event.persist(user.id.get).map {
+            eventId => {
+              EventData.persist(eventId, AggregatorService.HyperCounter, name)
+              WS.url("https://dig-scala.herokuapp.com/aggregator").withHeaders(("Content-Type", "text/json")).post(Json.stringify(Json.obj("id" -> eventId)))
+              Ok("Stored")
+            }
+          }.getOrElse(BadRequest("Event not stored"))
+        }
+      }.getOrElse(BadRequest)
+    }
+  }
+
+  def indexJson = Action(parse.json) { request =>
     DB.withConnection { implicit connection =>
       User.findOrCreateByEmail("hypercounter.herokuapp.com").map {
         user => {
@@ -50,6 +66,5 @@ object DefaultApi extends Controller {
       }.getOrElse(BadRequest)
     }
   }
-
 
 }
