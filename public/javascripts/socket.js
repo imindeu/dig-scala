@@ -38,8 +38,7 @@ var eventData = function(userEmail, onError, onMessage, onOnline, onOffline){
                     }
                 };
                 this.websocket.onerror = function(evt){
-                    console.log(evt);
-                    onError("Connection error!");
+                    //onError("Connection error!");
                 };
             }
         }.bind(socket);
