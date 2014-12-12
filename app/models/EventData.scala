@@ -2,12 +2,9 @@ package models
 
 import anorm.Pk
 import play.api.data.Form
-import models.AnormExtension._
+import dig.AnormExtension._
 import play.api.data.Forms._
 
-/**
- * Created by vassdoki on 12/12/14.
- */
 case class EventData(id: Pk[Long], event: Long, key: String, value: String) {
 
 }

@@ -1,15 +1,12 @@
 package models
 
-import AnormExtension._
+import dig.AnormExtension._
 import org.joda.time.DateTime
 import play.api.data._
 import Forms._
 import anorm.Pk
 
-/**
- * Created by vassdoki on 12/12/14.
- */
-case class Event(id: Pk[Long], date: DateTime, user: Long, eventData: List[EventData]) {
+case class Event(id: Pk[Long], date: DateTime, user: User, eventData: List[EventData]) {
 
 }
 
