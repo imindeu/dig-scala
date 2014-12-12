@@ -1,8 +1,8 @@
 package services
 
 import java.sql.Connection
-import anorm.{Pk, NotAssigned}
-import models.{Event, Stat, User}
+import anorm._
+import models._
 import play.api.db.DB
 import play.api.libs.json.Json
 import play.api.libs.ws.WS
@@ -28,8 +28,8 @@ object AggregatorService {
       }
   }
 
-  def locAggregator(value: String, user: User)(implicit connection: Connection): Unit = {
-    aggregator(LocKey, None, value, user, v => (v.toLong + value.toLong).toString)
+  def addAggregator(key: String, value: String, user: User)(implicit connection: Connection): Unit = {
+    aggregator(key, None, value, user, v => (v.toLong + value.toLong).toString)
   }
 
   def incrementAggregator(key: String, parentKey: Option[String], user: User)(implicit connection: Connection): Unit = {
@@ -44,7 +44,7 @@ object AggregatorService {
               list.foreach {
                 eventData =>
                   eventData.key match {
-                    case LocKey => locAggregator(eventData.value, event.user)
+                    case LocKey => addAggregator(LocKey, eventData.value, event.user)
                     case ProjectKey => incrementAggregator(ProjectKey + "_" + eventData.value, Some(ProjectKey), event.user)
                     case LanguageKey => incrementAggregator(LanguageKey + "_" + eventData.value, Some(LanguageKey), event.user)
                     case HyperCounter => incrementAggregator(HyperCounter, None, event.user)
