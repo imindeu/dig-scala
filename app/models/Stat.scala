@@ -4,8 +4,6 @@ import java.sql.Connection
 
 import anorm._
 import anorm.SqlParser._
-import org.joda.time.DateTime
-import play.api.libs.json._
 
 case class Stat(id: Pk[Long], key: String, value: String, user: User){
   def toJson = Json.obj("key" -> JsString(key), "value" -> JsString(value))
@@ -23,7 +21,7 @@ object Stat {
     }
 
   def findByKeyAndUser(key: String, user: User)(implicit connection: Connection): Option[Stat] = {
-    SQL("select * from stats where key = {key}") on("key" -> key) as simple.singleOpt
+    SQL("select * from stats where key = {key} and user_id = {userId}").on("key" -> key, "userId" -> user.id).as(simple.singleOpt)
   }
 
   def findById(id: Long)(implicit connection: Connection): Option[Stat] = {
@@ -38,7 +36,7 @@ object Stat {
           'value -> stat.value,
           'userId -> stat.user.id,
           'id -> stat.id
-        )
+        ).executeUpdate()
         Some(stat)
       }
       case NotAssigned => {
