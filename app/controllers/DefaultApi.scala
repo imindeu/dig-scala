@@ -2,6 +2,8 @@ package controllers
 
 import play.api.Play.current
 import play.api._
+import play.api.data.Form
+import play.api.data.Forms._
 import play.api.mvc._
 import models._
 import play.api.db.DB
@@ -35,17 +37,22 @@ object DefaultApi extends Controller {
     }
   }
 
-  def indexHypercounter(name: String) = Action { request =>
+  def indexHypercounter = Action { implicit request =>
     DB.withConnection { implicit connection =>
       User.findOrCreateByEmail("hypercounter.herokuapp.com").map {
         user => {
-          Event.persist(user.id.get).map {
-            eventId => {
-              EventData.persist(eventId, AggregatorService.HyperCounter, name)
-              WS.url("https://dig-scala.herokuapp.com/aggregator").withHeaders(("Content-Type", "text/json")).post(Json.stringify(Json.obj("id" -> eventId)))
-              Ok("Stored")
+          Form("name" -> nonEmptyText).bindFromRequest.fold(
+            formWithErrors => BadRequest("Missing name parameter"),
+            name => {
+              Event.persist(user.id.get).map {
+                eventId => {
+                  EventData.persist(eventId, AggregatorService.HyperCounter, name)
+                  WS.url("https://dig-scala.herokuapp.com/aggregator").withHeaders(("Content-Type", "text/json")).post(Json.stringify(Json.obj("id" -> eventId)))
+                  Ok("Stored")
+                }
+              }.getOrElse(BadRequest("Event not stored"))
             }
-          }.getOrElse(BadRequest("Event not stored"))
+          )
         }
       }.getOrElse(BadRequest)
     }
