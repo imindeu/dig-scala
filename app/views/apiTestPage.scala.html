@@ -19,6 +19,21 @@ function testStore() {
         $("#testRequestUrl").val("http://imind.hu:8888" + this.url);
     });
 }
+
+function testStorePost() {
+    // http://dig-scala.herokuapp.com
+    var jqxhr = $.post( "/hyperApi", $( "#digTestFormHyper" ).serialize(), function (){ $("#testRequestResulth" ).val("XXXXXXXX");})
+      .done(function() {
+        $("#testRequestResulth" ).val("Success");
+      })
+      .fail(function() {
+        $("#testRequestResulth" ).val("Error");
+      })
+      .always(function() {
+        $("#testRequestUrlh").val("http://dig-scala.herokuapp.com" + this.url);
+    });
+}
+
 </script>
     </head>
     <body>
@@ -41,6 +56,23 @@ function testStore() {
         <br/>
         Url used in the request:<br/>
         <input type="text" id="testRequestUrl" size="100"/><br />
+
+
+        <h1>DIG hyper API test</h1>
+
+        <form id="digTestFormHyper" method="POST" action="http://dig-scala.herokuapp.com/hyperApi"> <!-- http://imind.hu:8888 -->
+            Name: <input type="text" name="name" size="15"><br/>
+            <br/>
+            <input type="button" value="Mentés" onclick="testStorePost();"/>
+        </form>
+        <br />
+        Request result:<br/>
+        <input type="text" id="testRequestResulth"/><br />
+        <br/>
+        Url used in the request:<br/>
+        <input type="text" id="testRequestUrlh" size="100"/><br />
+
+
     </body>
 </html>
 
