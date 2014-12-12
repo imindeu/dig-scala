@@ -21,10 +21,22 @@ import scala.concurrent.Future
  */
 object OutputService extends Controller {
 
-  def sendData(statId: Long) = Action {
+  def registerUser(email: String) = Action {
     DB.withConnection { implicit connection =>
+      val user = User.findOrCreateByEmail(email)
+      Ok(Json.obj("error" -> JsBoolean(user.isEmpty)))
+    }
+  }
+
+  def sendData = Action.async { request: Request[AnyContent] =>
+    DB.withConnection { implicit connection =>
+      val statId: Option[Long] = {
+        val postData = request.body.asJson
+        if(postData.isDefined) postData.get.\("id").asOpt[Long]
+        else None
+      }
       val result = sendMessage(statId)
-      Ok(Json.obj("error" -> JsBoolean(!result)))
+      Future.successful(Ok(Json.obj("error" -> JsBoolean(!result))))
     }
   }
 
@@ -32,14 +44,15 @@ object OutputService extends Controller {
     Ok(views.html.websocket())
   }
 
-  protected def sendMessage(statId: Long)(implicit connection: Connection): Boolean = {
-    val stat = Stat.findById(statId)
-    if(stat.isDefined)
-    {
-      val msg = Json.stringify(stat.get.toJson)
-      val channel = Cache.getAs[(Int, Enumerator[String], Channel[String])]("channel_" + stat.get.user.id.get)
-      if(channel.isDefined) channel.get._3.push(msg)
-      true
+  protected def sendMessage(statId: Option[Long])(implicit connection: Connection): Boolean = {
+    if(statId.isDefined) {
+      val stat = Stat.findById(statId.get)
+      if (stat.isDefined) {
+        val msg = Json.stringify(stat.get.toJson)
+        val channel = Cache.getAs[(Int, Enumerator[String], Channel[String])]("channel_" + stat.get.user.id.get)
+        if (channel.isDefined) channel.get._3.push(msg)
+        true
+      } else false
     }else false
   }
 
