@@ -8,5 +8,9 @@ POST    /aggregator                 controllers.Aggregator.index
 GET     /apiTest                    controllers.Application.apiTest
 GET     /defaultApi                 controllers.DefaultApi.insert(email: String, keys: List[String], values: List[String])
 POST    /defaultApi                 controllers.DefaultApi.insert(email: String, keys: List[String], values: List[String])
+GET     /out/websocket/:userId      controllers.OutputService.websocket(userId: Long)
+GET     /out/test                   controllers.OutputService.test
+GET     /out/sendData               controllers.OutputService.sendData
+
 # Map static resources from the /public folder to the /assets URL path
 GET        /assets/*file          controllers.Assets.at(path="/public", file)

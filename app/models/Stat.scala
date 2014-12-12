@@ -5,8 +5,11 @@ import java.sql.Connection
 import anorm._
 import anorm.SqlParser._
 import org.joda.time.DateTime
+import play.api.libs.json._
 
-case class Stat(id: Pk[Long], key: String, value: String, user: User)
+case class Stat(id: Pk[Long], key: String, value: String, user: User){
+  def toJson = Json.obj("key" -> JsString(key), "value" -> JsString(value))
+}
 
 object Stat {
 

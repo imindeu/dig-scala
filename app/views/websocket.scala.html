@@ -1,0 +1,42 @@
+@()
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8" />
+    <title>WebSocket Test</title>
+    <script language="javascript" type="text/javascript">
+        var eventData = function(userId, onError, onMessage){
+            if("WebSocket" in window)
+            {
+                var wsUri = "ws://localhost:9000/out/websocket/"+ userId;
+                var isConnected = false;
+                websocket = new WebSocket(wsUri);
+                websocket.onopen = function(evt){
+                    isConnected = true;
+                };
+                websocket.onclose = function(evt){
+                    isConnected = false;
+                    onError("Connection closed!");
+                };
+                websocket.onmessage = function(evt){
+                    var data = JSON.parse(evt.data);
+                    if(!data || !data.hasOwnProperty('key') || !data.hasOwnProperty('value'))
+                    {
+                        onError ( "Invalid message format!" ) ;
+                    }else{
+                        data.value = parseInt(data.value);
+                        if(data.value > 50 || data.value < -50) onError("Invalid message format!");
+                        else onMessage(data);
+                    }
+                };
+                websocket.onerror = function(evt){
+                    onError("Event message error!")
+                };
+            }else onError("WebSocket not supported!")
+        }
+    </script>
+</head>
+<h2>WebSocket Test</h2>
+<script language="javascript" type="text/javascript">
+    eventData(1, function(msg){console.log(msg);}, function(data){console.log(data);});
+</script>
+
