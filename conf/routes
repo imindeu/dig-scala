@@ -8,6 +8,7 @@ POST        /aggregator                      controllers.Aggregator.index
 GET         /apiTest                         controllers.Application.apiTest
 GET         /defaultApi                      controllers.DefaultApi.insert(email: String, keys: List[String], values: List[String])
 POST        /defaultApi                      controllers.DefaultApi.insert(email: String, keys: List[String], values: List[String])
+POST        /hyperApi                        controllers.DefaultApi.indexHypercounter
 GET         /out/websocket/:userEmail        controllers.OutputService.websocket(userEmail: String)
 POST        /out/sendData                    controllers.OutputService.sendData
 GET         /out/test/:email                 controllers.OutputService.test(email: String)
