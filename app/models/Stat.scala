@@ -4,9 +4,10 @@ import java.sql.Connection
 
 import anorm._
 import anorm.SqlParser._
+import play.api.libs.json.Json
 
-case class Stat(id: Pk[Long], key: String, value: String, user: User){
-  def toJson = Json.obj("key" -> JsString(key), "value" -> JsString(value))
+case class Stat(id: Pk[Long], key: String, value: String, user: User) {
+  def toJson = Json.obj("key" -> key, "value" -> value)
 }
 
 object Stat {
