@@ -6,17 +6,16 @@ import anorm._
 import anorm.SqlParser._
 import dig.AnormExtension._
 
-case class EventData(id: Pk[Long], event: Event, key: String, value: String)
+case class EventData(id: Pk[Long], key: String, value: String)
 
 object EventData {
 
   private def simple(implicit connection: Connection) =
     get[Pk[Long]]("id")  ~
-      get[Long]("event_id") ~
       get[String]("key") ~
       get[String]("value") map {
-      case id ~ eventId ~ key ~ value =>
-        EventData(id, Event.findById(eventId).get, key, value)
+      case id ~ key ~ value =>
+        EventData(id, key, value)
     }
 
   def findById(id: Long)(implicit connection: Connection): Option[EventData] = {
