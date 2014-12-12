@@ -34,9 +34,7 @@ var eventData = function(userEmail, onError, onMessage, onOnline, onOffline){
                     {
                         onError("Invalid message format!");
                     }else{
-                        data.value = parseInt(data.value);
-                        if(data.value > 50 || data.value < -50) onError("Invalid message format!");
-                        else onMessage(data);
+                        onMessage(data);
                     }
                 };
                 this.websocket.onerror = function(evt){
