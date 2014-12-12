@@ -16,6 +16,8 @@ object AggregatorService {
   val ProjectKey = "project"
   val LanguageKey = "language"
   val HyperCounter = "hyperCounterName"
+  val HyperTaleCounter = "hyperTailCounter"
+  val HyperTaleConstant = "tales-from-the-cloud/upload_tale"
 
   def aggregator(key: String, parentKey: Option[String], value: String, user: User, f: String => String)(implicit connection: Connection): Unit = {
       val statOpt = Stat.findByKeyAndUser(key, user)
@@ -24,7 +26,7 @@ object AggregatorService {
         WS.url("/out/sendData").post(Json.stringify(Json.obj("id" -> stat.id.get)))
       })
       if (id == NotAssigned && parentKey.isDefined) {
-        aggregator(parentKey.get, None, "1", user, v => (v.toLong + 1).toString)
+        incrementAggregator(parentKey.get, None, user)
       }
   }
 
@@ -47,7 +49,12 @@ object AggregatorService {
                     case LocKey => addAggregator(LocKey, eventData.value, event.user)
                     case ProjectKey => incrementAggregator(ProjectKey + "_" + eventData.value, Some(ProjectKey), event.user)
                     case LanguageKey => incrementAggregator(LanguageKey + "_" + eventData.value, Some(LanguageKey), event.user)
-                    case HyperCounter => incrementAggregator(HyperCounter, None, event.user)
+                    case HyperCounter =>
+                      if (eventData.value == HyperTaleConstant) {
+                        incrementAggregator(HyperTaleCounter, None, event.user)
+                      } else {
+                        incrementAggregator(HyperCounter, None, event.user)
+                      }
                   }
               }
           }
