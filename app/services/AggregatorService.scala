@@ -27,6 +27,8 @@ object AggregatorService {
       })
       if (id == NotAssigned && parentKey.isDefined) {
         incrementAggregator(parentKey.get, None, user)
+      } else if (parentKey.isDefined) {
+        Stat.findByKeyAndUser(parentKey.get, user).map(parentStat => WS.url("https://dig-scala.herokuapp.com/out/sendData").withHeaders(("Content-Type", "text/json")).post(Json.stringify(Json.obj("id" -> parentStat.id.get))))
       }
   }
 
