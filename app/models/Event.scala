@@ -24,13 +24,13 @@ object Event {
   private def simple(implicit connection: Connection) =
     get[Pk[Long]]("id")  ~
       get[DateTime]("date") ~
-      get[Long]("user") map {
+      get[Long]("user_id") map {
       case id ~ date ~ userId =>
         Event(id, date, User.findById(userId).get)
     }
 
   def findById(id: Long)(implicit connection: Connection): Option[Event] = {
-    SQL("select * from event where id {id}") on("id" -> id) as simple.singleOpt
+    SQL("select * from events where id = {id}") on("id" -> id) as simple.singleOpt
   }
 
 }

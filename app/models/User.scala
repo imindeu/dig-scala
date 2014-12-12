@@ -16,7 +16,7 @@ object User {
     }
 
   def findById(id: Long)(implicit connection: Connection): Option[User] = {
-    SQL("select * from user where id {id}") on("id" -> id) as simple.singleOpt
+    SQL("select * from users where id {id}") on("id" -> id) as simple.singleOpt
   }
 
 }
