@@ -26,6 +26,10 @@ object Stat {
     SQL("select * from stats where key = {key}") on("key" -> key) as simple.singleOpt
   }
 
+  def findById(id: Long)(implicit connection: Connection): Option[Stat] = {
+    SQL("select * from stats where id = {id}") on("id" -> id) as simple.singleOpt
+  }
+
   def update(stat: Stat)(implicit connection: Connection): Option[Stat] = {
     stat.id match {
       case Id(id) => {

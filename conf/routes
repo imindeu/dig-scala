@@ -10,7 +10,7 @@ GET     /defaultApi                 controllers.DefaultApi.insert(email: String,
 POST    /defaultApi                 controllers.DefaultApi.insert(email: String, keys: List[String], values: List[String])
 GET     /out/websocket/:userId      controllers.OutputService.websocket(userId: Long)
 GET     /out/test                   controllers.OutputService.test
-GET     /out/sendData               controllers.OutputService.sendData
+GET     /out/sendData/:statId       controllers.OutputService.sendData(statId: Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET        /assets/*file          controllers.Assets.at(path="/public", file)
