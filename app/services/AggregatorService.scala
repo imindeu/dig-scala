@@ -23,7 +23,7 @@ object AggregatorService {
       val statOpt = Stat.findByKeyAndUser(key, user)
       val (id, newValue) = statOpt.fold((NotAssigned.asInstanceOf[Pk[Long]], value))(stat => (stat.id, f(stat.value)))
       Stat.update(Stat(id, key, newValue, user)).map(stat => {
-        WS.url("/out/sendData").post(Json.stringify(Json.obj("id" -> stat.id.get)))
+        WS.url("http://127.0.0.1:9000/out/sendData").post(Json.stringify(Json.obj("id" -> stat.id.get)))
       })
       if (id == NotAssigned && parentKey.isDefined) {
         incrementAggregator(parentKey.get, None, user)
