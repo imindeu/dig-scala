@@ -3,7 +3,6 @@ package services
 import java.sql.Connection
 import anorm.{Pk, NotAssigned}
 import models.{Event, Stat, User}
-import play.Logger
 import play.api.db.DB
 import play.api.libs.json.Json
 import play.api.libs.ws.WS
@@ -13,7 +12,6 @@ import play.api.Play.current
 
 object AggregatorService {
 
-//  implicit val aggregatorExecutionContext: ExecutionContext = Akka.system.dispatchers.lookup("aggregator-context")
   val LocKey = "loc"
   val ProjectKey = "project"
   val LanguageKey = "language"
