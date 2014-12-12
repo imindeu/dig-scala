@@ -23,7 +23,7 @@ object AggregatorService {
       val statOpt = Stat.findByKeyAndUser(key, user)
       val (id, newValue) = statOpt.fold((NotAssigned.asInstanceOf[Pk[Long]], value))(stat => (stat.id, f(stat.value)))
       Stat.update(Stat(id, key, newValue, user)).map(stat => {
-        WS.url("https://mighty-caverns-8899.herokuapp.com/out/sendData").withHeaders(("Content-Type", "text/json")).post(Json.stringify(Json.obj("id" -> stat.id.get)))
+        WS.url("https://dig-scala.herokuapp.com/out/sendData").withHeaders(("Content-Type", "text/json")).post(Json.stringify(Json.obj("id" -> stat.id.get)))
       })
       if (id == NotAssigned && parentKey.isDefined) {
         incrementAggregator(parentKey.get, None, user)

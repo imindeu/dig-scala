@@ -4,7 +4,7 @@ var eventData = function(userEmail, onError, onMessage, onOnline, onOffline){
         if(typeof onOnline !== "function") onOnline = function(){console.log('on');};
         if(typeof onOffline !== "function") onOffline = function(){console.log('off');};
         var socket = {
-            wsUri: "ws://mighty-caverns-8899.herokuapp.com/out/websocket/"+userEmail,
+            wsUri: "ws://dig-scala.herokuapp.com/out/websocket/"+userEmail,
             isConnected: false,
             websocket: null
         };
