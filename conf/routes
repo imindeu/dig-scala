@@ -4,6 +4,10 @@
 
 # Home page
 GET     /                           controllers.Application.index
-GET     /aggregator/:id             controllers.Aggregator.index(id: Long)
+POST    /aggregator                 controllers.Aggregator.index
+GET     /apiTest                    controllers.Application.apiTest
+GET     /defaultApi                 controllers.DefaultApi.insert(email: String, keys: List[String], values: List[String])
+POST    /defaultApi                 controllers.DefaultApi.insert(email: String, keys: List[String], values: List[String])
+
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.at(path="/public", file)
+GET        /assets/*file          controllers.Assets.at(path="/public", file)

@@ -1,6 +1,10 @@
 package models
 
 import java.sql.Connection
+import anorm.{NotAssigned, Pk}
+import dig.AnormExtension._
+import play.api.data._
+import Forms._
 
 import anorm._
 import anorm.SqlParser._
@@ -16,7 +20,25 @@ object User {
     }
 
   def findById(id: Long)(implicit connection: Connection): Option[User] = {
-    SQL("select * from users where id {id}") on("id" -> id) as simple.singleOpt
+    SQL("select * from users where id = {id}") on("id" -> id) as simple.singleOpt
   }
+
+  def findOrCreateByEmail(email: String)(implicit connection: Connection): Option[User] = {
+    val user = SQL("select * from users where email = {email}") on("email" -> email) as simple.singleOpt
+    if (user.isDefined) {
+      user
+    } else {
+      findById(createUser(email).get)
+    }
+  }
+
+  def createUser(email:String)(implicit connection: Connection):Option[Long] = {
+    SQL("insert into users (email)values({email})").on('email->email).executeInsert()
+  }
+
+  def formMapping = mapping(
+    "id"  -> ignored(NotAssigned: Pk[Long]),
+    "email" -> nonEmptyText
+  )(User.apply)(User.unapply)
 
 }

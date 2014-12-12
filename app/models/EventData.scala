@@ -4,6 +4,10 @@ import java.sql.Connection
 
 import anorm._
 import anorm.SqlParser._
+import anorm.{NotAssigned, Pk}
+import play.api.data.Form
+import play.api.data._
+import Forms._
 import dig.AnormExtension._
 
 case class EventData(id: Pk[Long], key: String, value: String)
@@ -26,4 +30,14 @@ object EventData {
     SQL("select * from event_data where event_id = {eventId}").on("eventId" -> eventId).as(simple *)
   }
 
+  def persist(eventId: Long, key: String, value: String)(implicit connection: Connection): Option[Long] = {
+    SQL("insert into event_data (key, value, event_id) values ({key}, {value}, {eventId})")
+      .on('key->key, 'value->value, 'eventId->eventId).executeInsert()
+  }
+
+  def formMapping = mapping(
+      "id" -> ignored(NotAssigned: Pk[Long]),
+      "key" -> nonEmptyText,
+      "value" -> nonEmptyText
+    )(EventData.apply)(EventData.unapply)
 }
