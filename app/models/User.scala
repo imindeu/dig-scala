@@ -33,7 +33,11 @@ object User {
   }
 
   def createUser(email:String)(implicit connection: Connection):Option[Long] = {
-    SQL("insert into users (email)values({email})").on('email->email).executeInsert()
+    if (email.size > 0) {
+      SQL("insert into users (email)values({email})").on('email -> email).executeInsert()
+    } else {
+      None
+    }
   }
 
   def formMapping = mapping(

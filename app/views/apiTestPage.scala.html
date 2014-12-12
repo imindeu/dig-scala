@@ -16,7 +16,7 @@ function testStore() {
         $("#testRequestResult" ).val("Error");
       })
       .always(function() {
-        $("#testRequestUrl").val(this.url);
+        $("#testRequestUrl").val("http://imind.hu:8888" + this.url);
     });
 }
 </script>
@@ -24,7 +24,7 @@ function testStore() {
     <body>
         <h1>DIG default API test</h1>
 
-        <form id="digTestForm" method="GET" action="/defaultApi">
+        <form id="digTestForm" method="GET" action="http://imind.hu:8888/defaultApi">
             Email address: <input type="text" name="email" size="35"/><br/>
             Kulcs: <input type="text" name="keys" size="15"> Érték: <input type="text" size="20" name="values"/><br/>
             Kulcs: <input type="text" name="keys" size="15"> Érték: <input type="text" size="20" name="values"/><br/>
