@@ -15,6 +15,7 @@ object AggregatorService {
   val LocKey = "loc"
   val ProjectKey = "project"
   val LanguageKey = "language"
+  val HyperCounter = "hyperCounterName"
 
   def aggregator(key: String, parentKey: Option[String], value: String, user: User, f: String => String)(implicit connection: Connection): Unit = {
       val statOpt = Stat.findByKeyAndUser(key, user)
@@ -31,14 +32,8 @@ object AggregatorService {
     aggregator(LocKey, None, value, user, v => (v.toLong + value.toLong).toString)
   }
 
-  def projectAggregator(value: String, user: User)(implicit connection: Connection): Unit = {
-    val key = ProjectKey + "_" + value
-    aggregator(key, Some(ProjectKey), "1", user, v => (v.toLong + 1L).toString)
-  }
-
-  def languageAggregator(value: String, user: User)(implicit connection: Connection): Unit = {
-    val key = LanguageKey + "_" + value
-    aggregator(key, Some(LanguageKey), "1", user, v => (v.toLong + 1L).toString)
+  def incrementAggregator(key: String, parentKey: Option[String], user: User)(implicit connection: Connection): Unit = {
+    aggregator(key, parentKey, "1", user, v => (v.toLong + 1L).toString)
   }
 
   def start(event: Event): Unit = {
@@ -50,8 +45,9 @@ object AggregatorService {
                 eventData =>
                   eventData.key match {
                     case LocKey => locAggregator(eventData.value, event.user)
-                    case ProjectKey => projectAggregator(eventData.value, event.user)
-                    case LanguageKey => languageAggregator(eventData.value, event.user)
+                    case ProjectKey => incrementAggregator(ProjectKey + "_" + eventData.value, Some(ProjectKey), event.user)
+                    case LanguageKey => incrementAggregator(LanguageKey + "_" + eventData.value, Some(LanguageKey), event.user)
+                    case HyperCounter => incrementAggregator(HyperCounter, None, event.user)
                   }
               }
           }
