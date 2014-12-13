@@ -37,7 +37,9 @@ object Event {
   }
 
   def persist(userId: Long)(implicit connection: Connection): Option[Long] = {
-    SQL("insert into events (created_at, user_id) values (now(), {user})").on('user -> userId).executeInsert()
+    //SQL("insert into events (created_at, user_id) values (now(), {user})").on('user -> userId).executeInsert()
+    SQL("insert into events (created_at, user_id) values (now(), '3')").executeInsert()
+    //hypercounter.herokuapp.com
   }
 
   def form = Form(
