@@ -55,7 +55,8 @@ object AggregatorService {
                       if (eventData.value == HyperTaleConstant) {
                         incrementAggregator(HyperTaleCounter, None, event.user)
                       } else {
-                        incrementAggregator(HyperCounter + "_" + eventData.value, Some(HyperCounter), event.user)
+                        incrementAggregator(HyperCounter, None, event.user)
+                        incrementAggregator(HyperCounter + "_" + eventData.value, None, event.user)
                       }
                   }
               }
