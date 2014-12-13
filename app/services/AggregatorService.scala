@@ -18,18 +18,24 @@ object AggregatorService {
   val HyperCounter = "hyperCounterName"
   val HyperTaleCounter = "hyperTailCounter"
   val HyperTaleConstant = "tales-from-the-cloud/upload_tale"
+  val AddedFiles = "added_files"
+  val RemovedFiles = "removed_files"
+  val ModifiedFiles = "modified_files"
+
+
 
   def aggregator(key: String, parentKey: Option[String], value: String, user: User, f: String => String)(implicit connection: Connection): Unit = {
-      val statOpt = Stat.findByKeyAndUser(key, user)
-      val (id, newValue) = statOpt.fold((NotAssigned.asInstanceOf[Pk[Long]], value))(stat => (stat.id, f(stat.value)))
-      Stat.update(Stat(id, key, newValue, user)).map(stat => {
-        WS.url("https://dig-scala.herokuapp.com/out/sendData").withHeaders(("Content-Type", "text/json")).post(Json.stringify(Json.obj("id" -> stat.id.get)))
-      })
-      if (id == NotAssigned && parentKey.isDefined) {
-        incrementAggregator(parentKey.get, None, user)
-      } else if (parentKey.isDefined) {
-        Stat.findByKeyAndUser(parentKey.get, user).map(parentStat => WS.url("https://dig-scala.herokuapp.com/out/sendData").withHeaders(("Content-Type", "text/json")).post(Json.stringify(Json.obj("id" -> parentStat.id.get))))
-      }
+    println("key: " + key + "; parentKey: " + parentKey + "value: " + value + "; user: " + user)
+    val statOpt = Stat.findByKeyAndUser(key, user)
+    val (id, newValue) = statOpt.fold((NotAssigned.asInstanceOf[Pk[Long]], value))(stat => (stat.id, f(stat.value)))
+    Stat.update(Stat(id, key, newValue, user)).map(stat => {
+      WS.url("https://dig-scala.herokuapp.com/out/sendData").withHeaders(("Content-Type", "text/json")).post(Json.stringify(Json.obj("id" -> stat.id.get)))
+    })
+    if (id == NotAssigned && parentKey.isDefined) {
+      incrementAggregator(parentKey.get, None, user)
+    } else if (parentKey.isDefined) {
+      Stat.findByKeyAndUser(parentKey.get, user).map(parentStat => WS.url("https://dig-scala.herokuapp.com/out/sendData").withHeaders(("Content-Type", "text/json")).post(Json.stringify(Json.obj("id" -> parentStat.id.get))))
+    }
   }
 
   def addAggregator(key: String, value: String, user: User)(implicit connection: Connection): Unit = {
@@ -58,6 +64,9 @@ object AggregatorService {
                         incrementAggregator(HyperCounter, None, event.user)
                         incrementAggregator(HyperCounter + "_" + eventData.value, None, event.user)
                       }
+                    case AddedFiles => addAggregator(AddedFiles, eventData.value, event.user)
+                    case RemovedFiles => addAggregator(RemovedFiles, eventData.value, event.user)
+                    case ModifiedFiles => addAggregator(ModifiedFiles, eventData.value, event.user)
                   }
               }
           }

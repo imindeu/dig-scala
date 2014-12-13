@@ -13,6 +13,7 @@ object Aggregator  extends Controller {
       DB.withConnection { implicit connection =>
         val eventOpt = Event.findById(id)
         eventOpt.fold(BadRequest("Error (event not found")){ event =>
+          println("id: " + id)
           AggregatorService.start(event)
           Ok("OK")
         }

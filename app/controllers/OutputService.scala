@@ -28,6 +28,7 @@ object OutputService extends Controller {
         if(postData.isDefined) postData.get.\("id").asOpt[Long]
         else None
       }
+      println("statId: " + statId)
       val result = sendMessage(statId)
       Future.successful(Ok(Json.obj("error" -> JsBoolean(!result))))
     }
